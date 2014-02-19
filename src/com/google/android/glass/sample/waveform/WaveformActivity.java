@@ -45,7 +45,7 @@ public class WaveformActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_waveform);
 
-        mWaveformView = (WaveformView) findViewById(R.id.waveform_view);
+        //mWaveformView = (WaveformView) findViewById(R.id.waveform_view);
         mDecibelView = (TextView) findViewById(R.id.decibel_view);
 
         // Compute the minimum required audio buffer size and allocate the buffer.
@@ -89,7 +89,7 @@ public class WaveformActivity extends Activity {
             AudioRecord record = new AudioRecord(AudioSource.MIC, SAMPLING_RATE,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, mBufferSize);
             record.startRecording();
-
+            	
             while (shouldContinue()) {
                 record.read(mAudioBuffer, 0, mBufferSize / 2);
                 mWaveformView.updateAudioData(mAudioBuffer);

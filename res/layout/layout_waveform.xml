@@ -18,12 +18,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
-    <com.google.android.glass.sample.waveform.WaveformView
+     
+     
+     <com.google.android.glass.sample.waveform.WaveformView
         android:id="@+id/waveform_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+
+  
     <TextView
         android:id="@+id/decibel_view"
         android:layout_width="wrap_content"
@@ -31,6 +34,7 @@
         android:layout_gravity="bottom|right"
         android:layout_marginRight="@dimen/footer_right_margin"
         android:layout_marginBottom="@dimen/footer_bottom_margin"
+        android:text="Hello"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </FrameLayout>

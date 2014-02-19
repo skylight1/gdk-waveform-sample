@@ -21,25 +21,35 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import java.util.LinkedList;
 
 /**
  * A view that displays audio data on the screen as a waveform.
  */
-public class WaveformView extends SurfaceView {
+public class WaveformView extends View {
 
     // The number of buffer frames to keep around (for a nice fade-out visualization).
     private static final int HISTORY_SIZE = 6;
 
+    
+    private SurfaceHolder mHolder;
     // To make quieter sounds still show up well on the display, we use +/- 8192 as the amplitude
     // that reaches the top/bottom of the view instead of +/- 32767. Any samples that have
     // magnitude higher than this limit will simply be clipped during drawing.
     private static final float MAX_AMPLITUDE_TO_DRAW = 8192.0f;
 
+
+	private static final String TAG = null;
+
     // The queue that will hold historical audio data.
     private final LinkedList<short[]> mAudioData;
+    
+    
 
     private final Paint mPaint;
 
@@ -50,6 +60,8 @@ public class WaveformView extends SurfaceView {
     public WaveformView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
+    
+    
 
     public WaveformView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -63,6 +75,8 @@ public class WaveformView extends SurfaceView {
         mPaint.setAntiAlias(true);
     }
 
+    
+   
     /**
      * Updates the waveform view with a new "frame" of samples and renders it. The new frame gets
      * added to the front of the rendering queue, pushing the previous frames back, causing them to
@@ -77,6 +91,7 @@ public class WaveformView extends SurfaceView {
         // We use a linked list that we treat as a queue for this.
         if (mAudioData.size() == HISTORY_SIZE) {
             newBuffer = mAudioData.removeFirst();
+            Log.d("Update Size", "yep");
             System.arraycopy(buffer, 0, newBuffer, 0, buffer.length);
         } else {
             newBuffer = buffer.clone();
@@ -84,14 +99,22 @@ public class WaveformView extends SurfaceView {
 
         mAudioData.addLast(newBuffer);
 
-        // Update the display.
-        Canvas canvas = getHolder().lockCanvas();
-        if (canvas != null) {
-            drawWaveform(canvas);
-            getHolder().unlockCanvasAndPost(canvas);
-        }
+        
+        
     }
 
+    
+    
+    @Override
+    public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        
+        drawWaveform(canvas);
+        // Draw the level line.
+       
+    }
+    
+    
     /**
      * Repaints the view's surface.
      *
@@ -100,7 +123,7 @@ public class WaveformView extends SurfaceView {
     private void drawWaveform(Canvas canvas) {
         // Clear the screen each time because SurfaceView won't do this for us.
         canvas.drawColor(Color.BLACK);
-
+        //Log.d("hey", "DrawWaveForm");
         float width = getWidth();
         float height = getHeight();
         float centerY = height / 2;

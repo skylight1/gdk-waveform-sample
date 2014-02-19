@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2013 Google Inc.
+<!--
+     Copyright (C) 2013 Google Inc.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -18,7 +19,9 @@
 
     <string name="app_name">Waveform</string>
     <string name="show_me_a_demo">show me a demo</string>
-
     <string name="decibel_format">%1$.1f dB</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="action_stop">Stop</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
