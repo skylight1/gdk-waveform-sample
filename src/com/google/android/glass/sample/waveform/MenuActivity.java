@@ -12,7 +12,7 @@ public class MenuActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_menu);
+		//setContentView(R.layout.activity_menu);
 	}
 
 	 @Override
@@ -38,5 +38,13 @@ public class MenuActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+	
+	@Override
+    public void onOptionsMenuClosed(Menu menu) {
+        super.onOptionsMenuClosed(menu);
+        // We must call finish() from this method to ensure that the activity ends either when an
+        // item is selected from the menu or when the menu is dismissed by swiping down.
+        finish();
     }
 }
