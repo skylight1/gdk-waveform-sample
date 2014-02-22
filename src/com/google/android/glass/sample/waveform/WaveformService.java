@@ -39,7 +39,8 @@ public class WaveformService extends Service {
 
 	    @Override
 	    public int onStartCommand(Intent intent, int flags, int startId) {
-	        if (mLiveCard == null) {
+	    	//android.os.Debug.waitForDebugger();
+	    	if (mLiveCard == null) {
 	            
 	            mLiveCard = mTimelineManager.createLiveCard(LIVE_CARD_TAG);
 	            mWaveRenderer = new WaveformRenderer(this);

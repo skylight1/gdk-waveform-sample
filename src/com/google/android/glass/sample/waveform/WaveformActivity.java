@@ -21,6 +21,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder.AudioSource;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -67,7 +68,7 @@ public class WaveformActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-
+       Log.d("Infinity", "OnPause");
         if (mRecordingThread != null) {
             mRecordingThread.stopRunning();
             mRecordingThread = null;

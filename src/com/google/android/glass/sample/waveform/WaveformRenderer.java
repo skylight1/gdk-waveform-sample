@@ -28,7 +28,7 @@ public class WaveformRenderer implements DirectRenderingCallback {
 			/ REFRESH_RATE_FPS;
 
 	private SurfaceHolder mHolder;
-	// private RenderThread mRenderThread; --mayneed
+	
 
 	private int mSurfaceWidth;
 	private int mSurfaceHeight;
@@ -42,7 +42,7 @@ public class WaveformRenderer implements DirectRenderingCallback {
 
 	private TextView mDecibelView;
 
-	//private RecordingThread mRecordingThread;
+	
 	private RenderThread mRenderThread;
 	
 	private Context mContext;
@@ -58,7 +58,7 @@ public class WaveformRenderer implements DirectRenderingCallback {
 
 		mWaveformView = (WaveformView) mLayout.findViewById(R.id.waveform_view);
 		mDecibelView = (TextView) mLayout.findViewById(R.id.decibel_view);
-		mDecibelView.setText("hey fucker");
+		
 		// Compute the minimum required audio buffer size and allocate the
 		// buffer.
 		
@@ -70,34 +70,34 @@ public class WaveformRenderer implements DirectRenderingCallback {
 		// TODO Auto-generated method stub
 		mSurfaceWidth = width;
 		mSurfaceHeight = height;
+		Log.d("Infinity", "surface Destoyed");
 		doLayout();
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
-		// mHolder = holder;
+		
 
 		mHolder = holder;
-		
+		Log.d("Infinity", "surface Destoyed");
 		mRenderThread = new RenderThread(mContext);
 		mRenderThread.start();
 		updateRenderingState();
-		// mRecordingThread = new RecordingThread();
-		// mRecordingThread.start();
+		
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// TODO Auto-generated method stub
 		mHolder = null;
+		Log.d("Infinity", "surface Destoyed");
 		updateRenderingState();
 	}
 
 	@Override
 	public void renderingPaused(SurfaceHolder surfaceHolder, boolean paused) {
 		mRenderingPaused = paused;
-		Log.d("Rendering Paused", "paused");
+		Log.d("Infinity", "Renderer paused");
 		updateRenderingState();
 	}
 
@@ -108,12 +108,19 @@ public class WaveformRenderer implements DirectRenderingCallback {
 		boolean shouldRender = (mHolder != null) && !mRenderingPaused;
 		boolean isRendering = (mRenderThread != null);
 
+		
+		
 		if (shouldRender != isRendering) {
 			if (shouldRender) {
-
+				Log.d("Infinity", "Keep On truckin");
 				mRenderThread = new RenderThread(mContext);
 				mRenderThread.start();
+				
+				
 			} else {
+				
+				Log.d("Infinity", "So This is Christmas");
+				
 				mRenderThread.quit();
 				mRenderThread = null;
 
@@ -151,7 +158,7 @@ public class WaveformRenderer implements DirectRenderingCallback {
 		try {
 			canvas = mHolder.lockCanvas();
 		} catch (RuntimeException e) {
-			Log.d("o", "lockCanvas failed", e);
+			Log.d("o", "lockCanvas ", e);
 		}
 
 		if (canvas != null) {
@@ -162,7 +169,7 @@ public class WaveformRenderer implements DirectRenderingCallback {
 			try {
 				mHolder.unlockCanvasAndPost(canvas);
 			} catch (RuntimeException e) {
-				Log.d("0", "unlockCanvasAndPost failed", e);
+				Log.d("0", "unlockCanvasAndPost ", e);
 			}
 		}
 	}
@@ -199,6 +206,9 @@ public class WaveformRenderer implements DirectRenderingCallback {
 		 * Requests that the rendering thread exit at the next opportunity.
 		 */
 		public synchronized void quit() {
+			
+			stopRecording();
+			Log.d("Infinity", "Quit");
 			mShouldRun = false;
 		}
 
@@ -207,13 +217,19 @@ public class WaveformRenderer implements DirectRenderingCallback {
 		private short[] mAudioBuffer;
 		private String mDecibelFormat;
 		
+		AudioRecord record; 
+		
+		
+		
+		
+		
 		@Override
 		public void run() {
 
 			android.os.Process
 					.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
 
-			AudioRecord record = new AudioRecord(AudioSource.MIC,
+			record = new AudioRecord(AudioSource.MIC,
 					SAMPLING_RATE, AudioFormat.CHANNEL_IN_MONO,
 					AudioFormat.ENCODING_PCM_16BIT, mBufferSize);
 			record.startRecording();
@@ -221,11 +237,35 @@ public class WaveformRenderer implements DirectRenderingCallback {
 			while (shouldRun()) {
 				long frameStart = SystemClock.elapsedRealtime();
 
-				record.read(mAudioBuffer, 0, mBufferSize / 2);
-				mWaveformView.updateAudioData(mAudioBuffer);
-				updateDecibelLevel();
+				int result  = record.read(mAudioBuffer, 0, mBufferSize / 2);
 				
-				repaint();
+				
+					if(result > 0){
+						
+						Log.d("Infinity", String.format("Loger%d",result));//"hit");
+						mWaveformView.updateAudioData(mAudioBuffer);
+						updateDecibelLevel();
+						repaint();
+					}else{
+						
+						Log.d("Infinity", String.format("%d-Away Team", result));
+						Log.d("Infinity", String.format("%d-state", record.getRecordingState()));
+						
+						if(record.getRecordingState() == AudioRecord.RECORDSTATE_STOPPED ){
+							//record.stop();
+							//record.release();
+							record.startRecording();
+							record.read(mAudioBuffer, 0, mBufferSize / 2);
+							mWaveformView.updateAudioData(mAudioBuffer);
+							updateDecibelLevel();
+							repaint();
+						}
+						
+						
+						
+					}
+				
+				
 				
 				
 				long frameLength = SystemClock.elapsedRealtime() - frameStart;
@@ -238,11 +278,17 @@ public class WaveformRenderer implements DirectRenderingCallback {
 					//Log.d("looper", "islooping");
 					
 				}
-
+				Log.d("RunLoop Exited", "islooping");
 			}
 
 		}
 
+		public void stopRecording(){
+			
+			record.stop();
+            record.release();
+			
+		}
 		private void updateDecibelLevel() {
 			// Compute the root-mean-squared of the sound buffer and then apply
 			// the formula for
@@ -261,6 +307,8 @@ public class WaveformRenderer implements DirectRenderingCallback {
 			double rms = Math.sqrt(sum / mAudioBuffer.length);
 			final double db = 20 * Math.log10(rms);
 			mDecibelView.setText(String.format(mDecibelFormat, db));
+			
+			
 			// Update the text view on the main thread.
 			
 		}
